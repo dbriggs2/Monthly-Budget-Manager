@@ -1,0 +1,125 @@
+<!DOCTYPE HTML>
+	<HEAD>
+		<META charset="UTF-8" />
+		<TITLE> Monthly Budget Manager </TITLE>
+		<link rel="stylesheet" src="{{url_for('static',filename="css/index.css")}}" />
+		<script src="https://cdn.jsdelivr.net/npm/apexcharts"> </script>
+	</HEAD>
+	<BODY>
+		<div id="headerBar">
+			Welcome to Capital One Monthly Budget Manager
+		</div>	
+		<div class="chart-wrap" style="position: relative;width:40%;float:right">
+        	<div id="chart" style="min-height: 129.006px;"> </div>
+        </div>
+        <script>
+        	var options = {
+				chart: {
+					width: 380,
+					type: 'donut',
+					animations: {
+						enabled: true,
+						easing: 'easeinout',
+						speed: 1300,
+						animateGradually: {
+							enabled: true,
+							delay: 150
+						},
+						dynamicAnimation: {
+							enabled: true,
+							speed: 500
+						}
+					}
+				},
+				// toolbar: {
+				// 	show: true,
+				// 	tools: {
+				// 		pan: true,
+				// 	}
+				// },
+				plotOptions: {
+					pie: {
+						customScale: 1.0,
+					}
+				},
+				dataLabels: {
+					enabled: true,
+				},
+				{% if data: %}
+					series: {{values | safe}},
+					labels: {{keys | safe}},
+				{% else: %}
+					series: [1],
+					labels: ['sampleCategory'],
+				{% endif %}
+				responsive: [{
+					breakpoint: 480,
+					options: {
+						chart: {
+							width: 200
+						},
+						legend: {
+							show: false
+						}
+					}
+				}],
+				legend: {
+					position: 'bottom',
+					offsetY: 0,
+					height: 50,
+				}
+			};
+			
+			var chart = new ApexCharts(
+				document.querySelector("#chart"),
+				options
+			);
+
+			chart.render()
+
+			function appendData(num) {
+				var arr = chart.w.globals.series.slice()
+				arr.push(num)
+				return arr;
+			}
+
+			function appendLabel(label) {
+				var arr = chart.w.globals.labels.slice()
+				arr.push(label)
+				return arr;
+			}
+		</script>
+		{% if data: %}
+			<table border="1px solid black">
+				<thead>
+					<tr>
+						<td> Transaction Area </td>
+						<td> Transaction Amount </td>
+					</tr>
+				</thead> 
+				<tbody>
+					{% for k in data %}
+						<tr>
+							<td> {{k}} </td>
+							<td> {{data[k]}} </td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		{% endif %}
+
+		<form name="transactionData" action="/" method = "POST" enctype="multipart/form-data">
+			Upload Transaction File<input type="file" name="transactionFile" />
+			<input type="submit" value="Upload File" />
+		</form>
+	</BODY>
+</HTML>
+<!--conn = sqlite3.connect('schedule.db')
+    c = conn.cursor()
+    c.execute(all that create table stuff)
+        c.execute('INSERT INTO task VALUES(?,?,?, ?, ?)', [None, account_id ,task_name, task_description,date_time])
+    conn.commit() #save changes to database
+    conn.close()
+    c.execute('SELECT id,task_name,task_description,date_time FROM task WHERE account_id = ?', [id])
+    result = c.fetchall()
+    conn.close()-->
