@@ -1,7 +1,1 @@
-TODO: Add in bootstrap to improve UI
-
-TODO: Add in functionality to delete budget summary
-      
-TODO: Add in functionality to read from text files for fixed income and expenses
-      
-TODO: Add in graphing capabilties
+Navigate inside Monthly-Budget-Manager/src directory and run 'flask run' to start application. Application will be run on local web server.
