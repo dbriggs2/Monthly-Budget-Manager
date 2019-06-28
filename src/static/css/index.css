@@ -1,4 +1,42 @@
 #headerBar{
 	background-color:aqua;
 	width:100%;
+	padding:5px;
+	margin:5px;
+}
+#addBudgetIcon {
+	float:right;
+	width:20px;
+	height:20px;
+	padding:5px;
+	margin-right:5px;
+}
+#title {
+	text-align:center;
+}
+#transactionTable {
+	margin-top:20px;
+}
+.chart-wrap {
+	position: relative;
+	width:40%;
+	float:right;
+}
+#chart {
+	min-height: 129.006px;
+}
+#uploadTransactionFormWrapper {
+	display:none;
+}
+.chart-wrap h2, #transactionTable {
+	text-align: center;
+}
+.expense {
+	color:red;
+}
+.netIncome {
+	font-weight: bold;
+}
+.income {
+	color:green;
 }

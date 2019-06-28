@@ -2,16 +2,39 @@
 	<HEAD>
 		<META charset="UTF-8" />
 		<TITLE> Monthly Budget Manager </TITLE>
-		<link rel="stylesheet" src="{{url_for('static',filename="css/index.css")}}" />
+		<link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/index.css')}}" />
 		<script src="https://cdn.jsdelivr.net/npm/apexcharts"> </script>
 	</HEAD>
 	<BODY>
 		<div id="headerBar">
-			Welcome to Capital One Monthly Budget Manager
-		</div>	
-		<div class="chart-wrap" style="position: relative;width:40%;float:right">
-        	<div id="chart" style="min-height: 129.006px;"> </div>
-        </div>
+			Welcome to Monthly Budget Manager
+			<img src="{{url_for('static',filename='images/plusIcon.png')}}" title="Add Monthly Transactions" id="addBudgetIcon" />
+		</div>
+		<h2 id="title"> Monthly Budget Summary for {{months[month - 1]}} {{year}} </h2>
+
+		<div id="monthSelectForm">
+			<form name="monthSelect" action="/" method = "POST">
+				Select a Month to View:
+				<select name="month">
+					{% for i in range(1,13) %}
+						<option value="{{i}}" {% if month == i %} selected {% endif %}> {{months[i - 1]}} </option>
+					{% endfor %}
+				</select>
+				<select name="year">
+					{% for availableYear in years %}
+						<option value="{{availableYear}}" {% if year == availableYear %} selected {% endif %}> {{availableYear}} </option>
+					{% endfor %}
+				</select>
+				<input type="submit" name="submitMonth" value="View Budget Summary">
+			</form>
+		</div>
+
+		{% if data %}
+			<div class="chart-wrap">
+				<h2> Expense Breakdown </h2>
+	        	<div id="chart"> </div>
+	        </div>
+        {% endif %}
         <script>
         	var options = {
 				chart: {
@@ -89,37 +112,79 @@
 				return arr;
 			}
 		</script>
-		{% if data: %}
-			<table border="1px solid black">
-				<thead>
-					<tr>
-						<td> Transaction Area </td>
-						<td> Transaction Amount </td>
-					</tr>
-				</thead> 
-				<tbody>
-					{% for k in data %}
-						<tr>
-							<td> {{k}} </td>
-							<td> {{data[k]}} </td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-		{% endif %}
 
-		<form name="transactionData" action="/" method = "POST" enctype="multipart/form-data">
-			Upload Transaction File<input type="file" name="transactionFile" />
-			<input type="submit" value="Upload File" />
-		</form>
+		<div id="transactionTable">
+			{% if data: %}
+				<h2> Budget Summary </h2>
+				<table border="1px single solid black" align="center">
+					<thead>
+						<tr>
+							<td> Transaction Type </td>
+							<td> Transaction Area </td>
+							<td> Transaction Amount </td>
+						</tr>
+					</thead> 
+					<tbody>
+						{% for k in data %}
+							<tr class="expense">
+								<td> Expense </td>
+								<td> {{k}} </td>
+								<td> ${{data[k]}} </td>
+							</tr>
+						{% endfor %}
+
+						{% for k in fixedExpenses %}
+							<tr class="expense">
+								<td> Expense </td>
+								<td> {{k}} </td>
+								<td> ${{fixedExpenses[k]}} </td>
+							</tr>
+						{% endfor %}
+
+						{% for k in fixedIncome %}
+							<tr class="income">
+								<td> Income </td>
+								<td> {{k}} </td>
+								<td> ${{fixedIncome[k]}} </td>
+							</tr>
+						{% endfor %}
+
+						<tr class="netIncome">
+							<td> </td>
+							<td> Net Monthly Income </td>
+							<td> ${{netIncome}} </td>
+						</tr> 
+					</tbody>
+				</table>
+				<a href="/deleteBudget?month={{month}}&year={{year}}"> Delete budget summary </a>
+			{% endif %}
+		</div>
+
+		<div id="uploadTransactionFormWrapper">
+			<form name="transactionData" action="/newBudget" method = "POST" enctype="multipart/form-data">
+				Upload Transaction File:
+				<input type="file" name="transactionFile" id="uploadTransactionFile"/>
+				<input type="submit" name="submitTransactions" value="Upload File" id="submitTransactionFile" />
+			</form>
+		</div>
+		<script>
+			document.getElementById('addBudgetIcon').onclick = function() {
+				document.getElementById('uploadTransactionFile').click();
+			};
+			document.getElementById('uploadTransactionFile').onchange = function() {
+				if (window.confirm("Are you sure you would like to upload the following file? \n\n" + "Filename: " + document.getElementById("uploadTransactionFile").value)) {
+					document.getElementById("submitTransactionFile").click();
+				}
+			};
+
+			{% if error %}
+				alert("Duplicate Monthly Transaction File Uploaded. Please Delete Previous Transaction Budget and Re-Upload");
+			{% endif %}
+
+			{% if noBudgetFound %}
+				alert("No Budget for specified month / year found");
+			{% endif %}
+		</script>
 	</BODY>
 </HTML>
-<!--conn = sqlite3.connect('schedule.db')
-    c = conn.cursor()
-    c.execute(all that create table stuff)
-        c.execute('INSERT INTO task VALUES(?,?,?, ?, ?)', [None, account_id ,task_name, task_description,date_time])
-    conn.commit() #save changes to database
-    conn.close()
-    c.execute('SELECT id,task_name,task_description,date_time FROM task WHERE account_id = ?', [id])
-    result = c.fetchall()
-    conn.close()-->
+

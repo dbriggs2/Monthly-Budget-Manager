@@ -3,3 +3,6 @@ node_modules/*
 package-lock.json
 package.json
 *pycache*
+budget_manager
+fixedExpenses.txt
+fixedIncome.txt
